@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PersistentDrawerLeft from './layout/layout.js';
 import { BrowserRouter} from 'react-router-dom';
+import { connect } from 'react-redux';
+
 const apiUrl = 'https://newsapi.org/v2/';
 const apiKey = 'apiKey=e0db911125a640929f14373ef2b3a766';
 const countryArg = 'country=us';
@@ -20,4 +22,5 @@ class App extends Component {
         )
     }
 }
+
 export default App;

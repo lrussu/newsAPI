@@ -8,8 +8,11 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import TopNews from "../top-news/top-news";
+import News from "../top-news/top-news";
 import MenuList from "../drawer/menu-list";
+import CustomizedInputBase from "../search/search";
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
@@ -101,18 +104,33 @@ export default function PersistentDrawerLeft() {
                 })}
             >
                 <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={open ? handleDrawerClose : handleDrawerOpen}
-                        edge="start"
-                        className={clsx(classes.menuButton, open && classes.open)}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" noWrap>
-                        News API
-                    </Typography>
+
+                    <Grid container spacing={3} direction="row">
+                        <Grid item xs={12} sm={3}>
+                           <Grid container direction="row" alignItems="center">
+                               <Grid item>
+                                   <IconButton
+                                        color="inherit"
+                                        aria-label="open drawer"
+                                        onClick={open ? handleDrawerClose : handleDrawerOpen}
+                                        edge="start"
+                                        className={clsx(classes.menuButton, open && classes.open)}
+                                    >
+                                        <MenuIcon />
+                                    </IconButton>
+                               </Grid>
+                               <Grid item>
+                            <Typography variant="h6" noWrap>
+                                News API
+                            </Typography>
+                               </Grid>
+
+                           </Grid>
+                        </Grid>
+                        <Grid item xs={12} sm={7}>
+                            <CustomizedInputBase />
+                        </Grid>
+                    </Grid>
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -140,7 +158,7 @@ export default function PersistentDrawerLeft() {
                 <div className={classes.drawerHeader} />
 
                 <Switch>
-                    <Route exact path='/' component={TopNews}/>
+                    <Route exact path='/' component={News}/>
                 </Switch>
             </main>
         </div>
