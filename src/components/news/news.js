@@ -59,14 +59,13 @@ function News(props) {
         return (
             <div className="root">
                 <div className="col-xs-8">
-                    <h1>React Axios Example</h1>
+                    <h1>News</h1>
                     <Grid
                         container
                         direction="column"
                         justify="space-between"
                         alignItems="flex-start"
                         spacing={2}
-                        xs={12}
                     >
                         { news.map(function (item, index) {
                             var imgSrc = item.urlToImage;
@@ -77,14 +76,14 @@ function News(props) {
                                     let r = re.exec(item.url);
                                     imgSrc = `https://img.youtube.com/vi/${r[1]}/0.jpg`;
                                 } else {
-                                    const categoryPath = category ? `/${category}` : ''
+                                    const categoryPath = ((category === null) || (category === undefined))  ? 'general' : `/${category}`
 
                                     imgSrc = `https://loremflickr.com/320/240${categoryPath}?lock=${index}`
                                 }
                             }
 
-                            return <Paper className={classes.paper}  xs={12}>
-                                <Grid container spacing={2}  xs={12}>
+                            return <Paper key={`item${index}`} className={classes.paper} xs={12} sm={12}>
+                                <Grid container spacing={2}>
                                     <Grid key={index} item xs={12} sm>
                                     <Typography variant="h6" component="h6">
                                         {item.title}

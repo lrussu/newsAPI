@@ -7,7 +7,6 @@ const initialState = {
 const categoryReducer = (state = initialState, action) => {
     switch (action.type) {
         case CATEGORY.SET:
-            console.log("categoryReducer")
             return { ...state, selectedCategory: action.payload }
         default:
             return state

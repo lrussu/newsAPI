@@ -63,18 +63,10 @@ function CustomizedInputBase(props) {
     );
 }
 
-const mapStateToProps = function(state) {
-    console.log(state)
-    return {
-        categoryList: state.initialState.category,
-        selectedCategory: state.selectedCategory.selectedCategory
-    }
-}
-
 const mapDispatchToProps = (dispatch) => {
     return {
         actions: bindActionCreators(searchActions, dispatch)
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CustomizedInputBase);
+export default connect(null, mapDispatchToProps)(CustomizedInputBase);

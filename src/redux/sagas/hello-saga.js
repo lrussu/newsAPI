@@ -1,10 +1,8 @@
 import { put, call, takeEvery, all } from 'redux-saga/effects'
-import { setCategory } from '../actions/category-actions'
 import { fetchedNews } from '../actions/news-actions'
-import { searchByQuery, searchByCategory } from '../actions/search-actions'
-import { CATEGORY, SEARCH, NEWS } from '../actions/actionTypes'
+import { CATEGORY, SEARCH } from '../actions/actionTypes'
 import axios from "axios";
-
+import {setCategory} from "../actions/category-actions";
 
 const apiUrl = 'https://newsapi.org/v2/';
 const apiKey = 'apiKey=e0db911125a640929f14373ef2b3a766';
@@ -21,23 +19,17 @@ function topNewsAPI(category) {
 }
 
 function everyNewsAPI(query) {
-    const queryArg = `q=${query}`;
+    const queryArg = `q=${encodeURIComponent(query)}`;
 
     const everyQueryUrl = `${everyUrl}&${queryArg}`;
+    console.log(everyQueryUrl)
     return axios.get(everyQueryUrl);
 }
 
-const delay = (ms) => new Promise(res => setTimeout(res, ms))
-
 function* fetchTopNewsAsyncEffectSaga(action) {
-    yield delay(1000)
-    yield console.log('fetchTopNewsAsyncEffectSaga()')
-    yield put(searchByCategory('sports'))
-
     try {
         // data is obtained after axios call is resolved
         let { data } = yield call(topNewsAPI, action.payload);
-        console.log(data.articles)
         // dispatch action to change redux state
         yield put(fetchedNews(data.articles));
 
@@ -47,14 +39,9 @@ function* fetchTopNewsAsyncEffectSaga(action) {
 }
 
 function* fetchNewsByQueryAsyncEffectSaga(action) {
-    yield delay(1000)
-    yield console.log('fetchNewsByQueryAsyncEffectSaga()')
-    yield put(searchByQuery('sports'))
-
     try {
         // data is obtained after axios call is resolved
         let { data } = yield call(everyNewsAPI, action.payload);
-        console.log(data.articles)
         // dispatch action to change redux state
         yield put(fetchedNews(data.articles));
 
@@ -64,17 +51,15 @@ function* fetchNewsByQueryAsyncEffectSaga(action) {
 }
 
 function* watcherSagaCategorySelect() {
-    yield console.log('watchCategorySelect()')
     yield takeEvery(CATEGORY.SET, fetchTopNewsAsyncEffectSaga)
 }
 
 function* watcherSagaQuerySet() {
-    yield console.log('watchCategorySelect()')
     yield takeEvery(SEARCH.QUERY, fetchNewsByQueryAsyncEffectSaga)
 }
 
 function* helloSaga() {
-    console.log('Hello Sagas!')
+    yield put(setCategory('sport'))
 }
 
 export default function* rootSaga() {

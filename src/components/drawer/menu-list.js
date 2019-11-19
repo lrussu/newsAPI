@@ -33,20 +33,10 @@ function MenuList(props) {
                 </ListItem>
             ))}
         </List>
-        // <Divider />
-        // <List>
-        //     {['All mail', 'Trash', 'Spam'].map((text, index) => (
-        //         <ListItem button key={text}>
-        //             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-        //             <ListItemText primary={text} />
-        //         </ListItem>
-        //     ))}
-        // </List>
     );
 }
 
 const mapStateToProps = function(state) {
-    console.log(state)
     return {
         categoryList: state.initialState.category,
         selectedCategory: state.selectedCategory.selectedCategory
@@ -60,19 +50,3 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MenuList);
-
-// function Comment(props) {
-//     const { id, content } = props.comment;
-//
-//     // Вызов действий через props.dispatch()
-//     const editComment = () => props.dispatch(updateComment(id, content));
-//     const removeComment = () => props.dispatch(deleteComment(id));
-//
-//     return (
-//         <div>
-//             <p>{ content }</p>
-//             <button type="button" onClick={editComment}>Edit Comment</button>
-//             <button type="button" onClick={removeComment}>Remove Comment</button>
-//         </div>
-//     )
-// }
