@@ -126,7 +126,7 @@ export default function PersistentDrawerLeft() {
                            </Grid>
                         </Grid>
                         <Grid item xs={12} sm={7}>
-                            <CustomizedInputBase />
+                            {/*<CustomizedInputBase />*/}
                         </Grid>
                     </Grid>
                 </Toolbar>

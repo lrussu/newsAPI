@@ -1,4 +1,6 @@
 import React from "react";
+import { useEffect } from "react";
+
 import Grid from '@material-ui/core/Grid';
 import Typography from "@material-ui/core/Typography";
 import Paper from '@material-ui/core/Paper';
@@ -7,10 +9,21 @@ import Box from '@material-ui/core/Box';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
+import ListItemLoader from "../loader/loader";
+import { bindActionCreators } from 'redux';
+import * as newsActions from '../../redux/actions/news-actions';
+
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
     },
+
+    scroll: {
+        backgroundColor: 'text.primary',
+        height: 300,
+        overflow: 'scroll',
+    },
+
     paper: {
         padding: theme.spacing(2),
         margin: theme.spacing(2)
@@ -18,22 +31,18 @@ const useStyles = makeStyles(theme => ({
 
     relativeBox: {
         position: 'relative',
-        // z-index: 1,
         width: 100,
         height: 100,
         overflow: 'hidden',
-        // -webkit-border-radius: 8,
         radius: 8
     },
 
     imageBox: {
         position: 'relative',
         margin: 'auto',
-        // z-index: 1,
         width: 100,
         height: 100,
         overflow: 'hidden',
-        // -webkit-border-radius: 8,
         radius: 8,
 
         borderColor: 'text.primary',
@@ -49,14 +58,57 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function News(props) {
 
-    const news = props.news
-    const category = props.selectedCategory
+const generateImageUrl = (imageUrl, newsUrl, category, imageIndex) => {
+    var imgSrc = imageUrl;
+
+    if (imgSrc === null) {
+        let re = /^https:\/\/www.youtube.com\/watch.{1}v=(?<id>.+?)$/;
+        if ( re.test(newsUrl)) {
+            let r = re.exec(newsUrl);
+            imgSrc = `https://img.youtube.com/vi/${r[1]}/0.jpg`;
+        } else {
+            const categoryPath = ((category === null) || (category === undefined))  ? '/general' : `/${category}`
+
+            imgSrc = `https://loremflickr.com/320/240${categoryPath}?lock=${imageIndex}`
+        }
+    }
+
+    return imgSrc
+}
+
+function News(props) {
 
     const classes = useStyles();
 
-        return (
+    const handleScroll = () => {
+
+        const { fetchMoreNews } = props.actions
+        const { moreNewsRequest } = props
+
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            if (moreNewsRequest) {
+                fetchMoreNews(moreNewsRequest);
+            } else {
+                console.log("moreNewsRequest is null")
+            }
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll );
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    });
+
+    const { isLoading, error, news, category } = props;
+
+    if (news.length === 0 && isLoading) return <ListItemLoader />;
+    if ( error !== null ) return <p>Error: {error}</p>;
+
+    return (
             <div className="root">
                 <div className="col-xs-8">
                     <h1>News</h1>
@@ -67,38 +119,29 @@ function News(props) {
                         alignItems="flex-start"
                         spacing={2}
                     >
-                        { news.map(function (item, index) {
-                            var imgSrc = item.urlToImage;
+                        { news.map(
+                            function (item, index) {
+                                const { urlToImage, url, title, description } = item
+                                const imgSrc = generateImageUrl(urlToImage, url, category, index)
+                                const { paper, imageBox, image} = classes
 
-                            if (imgSrc == null) {
-                                let re = /^https:\/\/www.youtube.com\/watch.{1}v=(?<id>.+?)$/;
-                                if ( re.test(item.url)) {
-                                    let r = re.exec(item.url);
-                                    imgSrc = `https://img.youtube.com/vi/${r[1]}/0.jpg`;
-                                } else {
-                                    const categoryPath = ((category === null) || (category === undefined))  ? 'general' : `/${category}`
-
-                                    imgSrc = `https://loremflickr.com/320/240${categoryPath}?lock=${index}`
-                                }
-                            }
-
-                            return <Paper key={`item${index}`} className={classes.paper} xs={12} sm={12}>
-                                <Grid container spacing={2}>
-                                    <Grid key={index} item xs={12} sm>
-                                    <Typography variant="h6" component="h6">
-                                        {item.title}
-                                    </Typography>
-                                    <Typography component="p">
-                                        {item.description}
-                                    </Typography>
-                                 </Grid>
-                                <Grid key={`i${index}`} item>
-                                    <Box borderRadius={16} className={classes.imageBox}>
-                                        <img className={classes.image} src={imgSrc} alt=""/>
-                                    </Box>
-                                </Grid>
-                                </Grid>
-                            </Paper>
+                                return <Paper key={`item${index}`} className={ paper } xs={12} sm={12}>
+                                    <Grid container spacing={2}>
+                                        <Grid key={index} item xs={12} sm>
+                                            <Typography variant="h6" component="h6">
+                                             { title }
+                                            </Typography>
+                                            <Typography component="p">
+                                               { description }
+                                            </Typography>
+                                         </Grid>
+                                        <Grid key={`i${index}`} item>
+                                             <Box borderRadius={16} className={ imageBox }>
+                                                 <img className={ image } src={ imgSrc } alt=""/>
+                                             </Box>
+                                         </Grid>
+                                    </Grid>
+                                </Paper>
                         })}
                     </Grid>
                 </div>
@@ -107,9 +150,23 @@ function News(props) {
 }
 
 const mapStateToProps = state => ({
-    news: state.fetchedNews.news,
-    selectedCategory: state.selectedCategory.selectedCategory
+    isLoading: state.newsReducer.isLoading,
+    news: state.newsReducer.news,
+    error: state.newsReducer.error,
+    selectedCategory: state.selectedCategory.selectedCategory,
+
+    moreNewsRequest: state.newsReducer.moreNewsRequest ?
+        {
+            category: state.selectedCategory.selectedCategory,
+            q: null,
+            page: state.newsReducer.moreNewsRequest.page
+        } : null
 })
 
-export default connect(mapStateToProps, null)(News)
+const mapDispatchToProps = dispatch => {
+    return {
+        actions: bindActionCreators(newsActions, dispatch)
+    }
+}
 
+export default connect(mapStateToProps, mapDispatchToProps)(News)

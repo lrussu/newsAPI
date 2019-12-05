@@ -7,5 +7,5 @@ export default combineReducers({
     initialState: searchReducer,
     selectedCategory: categoryReducer,
     searchCategory: searchReducer,
-    fetchedNews: newsReducer
+    newsReducer
 })

@@ -1,11 +1,11 @@
 import { put, call, takeEvery, all } from 'redux-saga/effects'
-import { fetchedNews } from '../actions/news-actions'
+import { fetchNews } from '../actions/news-actions'
 import { CATEGORY, SEARCH } from '../actions/actionTypes'
 import axios from "axios";
-import {setCategory} from "../actions/category-actions";
-
+import { setCategory } from "../actions/category-actions";
+import { newsWatcherSaga }  from './news-saga';
 const apiUrl = 'https://newsapi.org/v2/';
-const apiKey = 'apiKey=e0db911125a640929f14373ef2b3a766';
+const apiKey = 'apiKey=4e9b7b6204a74011856b2b966027895d';
 const countryArg = 'country=us';
 
 const topUrl = `${apiUrl}top-headlines?${apiKey}&${countryArg}`;
@@ -22,7 +22,7 @@ function everyNewsAPI(query) {
     const queryArg = `q=${encodeURIComponent(query)}`;
 
     const everyQueryUrl = `${everyUrl}&${queryArg}`;
-    console.log(everyQueryUrl)
+
     return axios.get(everyQueryUrl);
 }
 
@@ -31,7 +31,10 @@ function* fetchTopNewsAsyncEffectSaga(action) {
         // data is obtained after axios call is resolved
         let { data } = yield call(topNewsAPI, action.payload);
         // dispatch action to change redux state
-        yield put(fetchedNews(data.articles));
+
+        console.log("ACTION")
+        console.log(action.payload)
+        yield put(fetchNews(action.payload));
 
     } catch (e) {
         // alert using an alert library
@@ -43,7 +46,7 @@ function* fetchNewsByQueryAsyncEffectSaga(action) {
         // data is obtained after axios call is resolved
         let { data } = yield call(everyNewsAPI, action.payload);
         // dispatch action to change redux state
-        yield put(fetchedNews(data.articles));
+        yield put(fetchNews(data.articles));
 
     } catch (e) {
         // alert using an alert library
@@ -59,13 +62,14 @@ function* watcherSagaQuerySet() {
 }
 
 function* helloSaga() {
-    yield put(setCategory('sport'))
+    yield put(setCategory('sports'))
 }
 
 export default function* rootSaga() {
     yield all([
         helloSaga(),
         watcherSagaCategorySelect(),
-        watcherSagaQuerySet()
+     //   watcherSagaQuerySet(),
+        newsWatcherSaga()
     ])
 }

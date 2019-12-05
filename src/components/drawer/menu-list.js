@@ -19,14 +19,14 @@ function capitalize(str){
 
 function MenuList(props) {
     const category = props.categoryList
-    const selectedCategory = props.selectedCategory
+    const { selectedCategory } = props
 
     const { setCategory } = props.actions;
     const selectCategory = (categoryName) => setCategory(categoryName);
 
     return (
         <List>
-            {category.map((categoryName, index) => (
+            { category.map((categoryName, index) => (
                 <ListItem button component="button" onClick={ () => selectCategory(categoryName) } key={categoryName} selected={categoryName === selectedCategory ? true : false}>
                     <ListItemIcon>{index % 2 === 0 ? <FitnessCenterIcon /> : <DirectionsBikeIcon />}</ListItemIcon>
                     <Link to='/'><ListItemText primary={ capitalize(categoryName) } /></Link>
